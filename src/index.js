@@ -12,6 +12,7 @@ const { initializeDatabase } = require('./config/database');
 const { initializeRedis } = require('./config/redis');
 const { WorkflowOrchestrator } = require('./nodes/workflow-orchestrator');
 const { SystemHealthMonitor } = require('./nodes/system-health-monitor');
+const { ListingDescriptionGenerator } = require('./nodes/listing-description-generator');
 const logger = require('./utils/logger');
 
 const app = express();
@@ -38,6 +39,40 @@ app.get('/health', (req, res) => {
     redis: 'connected',
     uptime: process.uptime()
   });
+});
+
+// Listing Description Generator endpoint
+app.post('/api/generate-description', async (req, res) => {
+  try {
+    const propertyData = req.body.propertyData;
+    const options = req.body.options || {};
+    
+    if (!propertyData) {
+      return res.status(400).json({
+        success: false,
+        error: 'propertyData is required'
+      });
+    }
+    
+    const generator = new ListingDescriptionGenerator();
+    await generator.initialize();
+    
+    const result = await generator.generateDescription(propertyData, options);
+    
+    res.json(result);
+  } catch (error) {
+    logger.error('Error in /api/generate-description:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get node information
+app.get('/api/nodes/listing-description-generator', (req, res) => {
+  const generator = new ListingDescriptionGenerator();
+  res.json(generator.getInfo());
 });
 
 // Initialize system
