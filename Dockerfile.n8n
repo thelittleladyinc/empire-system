@@ -19,5 +19,5 @@ WORKDIR /home/node
 # Expose port
 EXPOSE 10000
 
-# Start n8n
-CMD ["n8n", "start"]
+# Start n8n using the full path
+CMD ["/usr/local/bin/n8n", "start"]
