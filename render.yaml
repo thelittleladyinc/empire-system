@@ -1,0 +1,77 @@
+services:
+  # Empire System API (existing)
+  - type: web
+    name: empire-system
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: empire-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: empire-redis
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /health
+
+  # n8n Workflow Automation (new)
+  - type: web
+    name: n8n-empire
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.n8n
+    envVars:
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: true
+      - key: N8N_BASIC_AUTH_USER
+        value: admin
+      - key: N8N_BASIC_AUTH_PASSWORD
+        sync: false
+      - key: DB_TYPE
+        value: postgresdb
+      - key: DB_POSTGRESDB_HOST
+        fromDatabase:
+          name: empire-db
+          property: host
+      - key: DB_POSTGRESDB_PORT
+        fromDatabase:
+          name: empire-db
+          property: port
+      - key: DB_POSTGRESDB_DATABASE
+        fromDatabase:
+          name: empire-db
+          property: database
+      - key: DB_POSTGRESDB_USER
+        fromDatabase:
+          name: empire-db
+          property: user
+      - key: DB_POSTGRESDB_PASSWORD
+        fromDatabase:
+          name: empire-db
+          property: password
+      - key: N8N_PORT
+        value: 10000
+      - key: WEBHOOK_URL
+        value: https://n8n-empire.onrender.com/
+      - key: N8N_ENCRYPTION_KEY
+        sync: false
+      - key: EMPIRE_API_URL
+        value: https://empire-system.onrender.com
+    healthCheckPath: /healthz
+
+databases:
+  - name: empire-db
+    plan: free
+    databaseName: empire_system
+    user: empire_user
+
+  - name: empire-redis
+    plan: free
