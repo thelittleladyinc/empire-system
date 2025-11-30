@@ -1,23 +1,8 @@
 FROM n8nio/n8n:latest
 
-# Set working directory
-WORKDIR /home/node
-
-# Environment variables will be set via Render dashboard
-# N8N_BASIC_AUTH_ACTIVE=true
-# N8N_BASIC_AUTH_USER=admin
-# N8N_BASIC_AUTH_PASSWORD=<your-password>
-# DB_TYPE=postgresdb
-# DB_POSTGRESDB_HOST=<from-render>
-# DB_POSTGRESDB_PORT=5432
-# DB_POSTGRESDB_DATABASE=<from-render>
-# DB_POSTGRESDB_USER=<from-render>
-# DB_POSTGRESDB_PASSWORD=<from-render>
-# N8N_PORT=10000
-# WEBHOOK_URL=https://n8n-empire.onrender.com/
-
-# Expose port
+# The n8n image already has everything configured
+# We just need to expose the port and let it run with default command
 EXPOSE 10000
 
-# Start n8n using the full path
-CMD ["/usr/local/bin/n8n", "start"]
+# Use the default entrypoint and command from the n8n image
+# No CMD needed - will use the image's default
