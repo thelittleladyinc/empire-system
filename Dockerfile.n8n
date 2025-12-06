@@ -1,8 +1,8 @@
 FROM n8nio/n8n:latest
 
-# The n8n image already has everything configured
-# We just need to expose the port and let it run with default command
-EXPOSE 10000
+USER root
+RUN npm install --no-audit --no-fund moment-timezone @blotato/n8n-nodes-blotato
 
-# Use the default entrypoint and command from the n8n image
-# No CMD needed - will use the image's default
+USER node
+
+ENV N8N_ADDITIONAL_MODULES="moment-timezone @blotato/n8n-nodes-blotato"
